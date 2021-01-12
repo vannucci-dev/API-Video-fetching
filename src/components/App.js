@@ -1,54 +1,43 @@
-import React from 'react';
-import SearchBar from './SearchBar';
-import VideoList from './Videolist';
-import VideoDetail from './VideoDetail';
-import youtube from '../api/youtube';
+import React, { useState, useEffect } from "react";
+import SearchBar from "./SearchBar";
+import VideoList from "./Videolist";
+import VideoDetail from "./VideoDetail";
+import youtube from "../api/youtube";
 
-class App extends React.Component{
+const App = () => {
+  const [videos, setVideos] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-    state = {videos : [], selectedVideo: null}
+  const onTermSubmit = async (term) => {
+    const { data } = await youtube.get("/search", {
+      params: {
+        q: term,
+      },
+    });
 
-    componentDidMount(){
-        this.onTermSubmit('cream heroes');
-    }
-    
-    onTermSubmit = async (term)=> {
-            
-      const response =  await youtube.get('/search', {
-            params: {
-                q: term
-            }
-        });
+    setVideos(data.items);
+    setSelectedVideo(data.items[0]);
+  };
 
-        this.setState({
-            videos:response.data.items,
-            selectedVideo: response.data.items[0]
-        });
-    };
+  useEffect(() => {
+    onTermSubmit("cream heroes");
+  }, []);
 
-    onVideoSelect = (video)=> {
-        this.setState({selectedVideo: video});
-    }
-    
-    render(){
-        return(
-            <div className='ui container'>
-                <SearchBar whenSubmitted={this.onTermSubmit}/>
-                <div className='ui grid'>
-                    <div className='ui row'>
-                        <div className='eleven wide column'>
-                        <VideoDetail selectedVideo={this.state.selectedVideo} />
-
-                        </div>
-                        <div className='five wide column'>
-                            <VideoList onVideoSelect={this.onVideoSelect} videos={this.state.videos} />
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )
-    }
-}
+  return (
+    <div className="ui container">
+      <SearchBar whenSubmitted={onTermSubmit} />
+      <div className="ui grid">
+        <div className="ui row">
+          <div className="eleven wide column">
+            <VideoDetail selectedVideo={selectedVideo} />
+          </div>
+          <div className="five wide column">
+            <VideoList onVideoSelect={selectedVideo} videos={videos} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default App;
