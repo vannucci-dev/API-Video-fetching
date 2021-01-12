@@ -1,6 +1,6 @@
 ### React API Video Fetching App
 
-##Version 1.1
+## Version 1.1
 
 The application is re-formatted to use funcional components instead of class components.
 
